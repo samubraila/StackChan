@@ -1,0 +1,18 @@
+{
+  "name": "stackchan-desktop",
+  "productName": "StackChan Desktop",
+  "version": "1.0.0",
+  "description": "Desktop-App zum Steuern des M5Stack StackChan per Bluetooth",
+  "main": "main.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "icon": "node scripts/make-icon.js",
+    "package": "electron-packager . \"StackChan Desktop\" --platform=win32 --arch=x64 --out=dist --overwrite --asar --icon=build/icon.ico --ignore=^/dist --ignore=^/scripts --ignore=^/build/icons --ignore=^/README.md --ignore=^/\\.gitignore"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^44.5.1"
+  }
+}

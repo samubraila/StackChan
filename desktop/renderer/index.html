@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+  <title>StackChan Desktop</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="assets/icon.png" alt="" width="40" height="40">
+        <div>
+          <strong>StackChan</strong>
+          <span>Desktop</span>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Bereiche">
+        <button class="nav-item" data-view="head" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
+          Kopf
+        </button>
+        <button class="nav-item" data-view="face">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="10.5" r="1.2"/><circle cx="15.5" cy="10.5" r="1.2"/><path d="M9 15h6"/></svg>
+          Gesicht
+        </button>
+        <button class="nav-item" data-view="light">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>
+          Licht
+        </button>
+        <button class="nav-item" data-view="dance">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          Tanz
+        </button>
+        <button class="nav-item" data-view="wifi">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.8a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16.1a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1"/></svg>
+          WLAN
+        </button>
+        <button class="nav-item" data-view="help">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/></svg>
+          Hilfe
+        </button>
+      </nav>
+
+      <section class="connection" aria-live="polite">
+        <div class="conn-status">
+          <span class="dot" id="conn-dot" data-status="disconnected"></span>
+          <span id="conn-label">Nicht verbunden</span>
+        </div>
+        <p id="conn-detail" class="conn-detail">Vorschau-Modus: Änderungen werden nur hier angezeigt.</p>
+        <button id="connect-btn" class="btn primary block" type="button">Verbinden</button>
+      </section>
+    </aside>
+
+    <main class="main">
+      <section class="stage" aria-label="Vorschau">
+        <div class="robot" id="robot">
+          <div class="head" id="head">
+            <canvas id="face" role="img" aria-label="Gesicht von StackChan"></canvas>
+          </div>
+          <div class="body">
+            <div class="leds" id="led-left"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="leds" id="led-right"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+        <dl class="pose">
+          <div><dt>Drehung</dt><dd id="pose-yaw">0,0°</dd></div>
+          <div><dt>Neigung</dt><dd id="pose-pitch">0,0°</dd></div>
+        </dl>
+        <p class="spin-badge" id="spin-badge" hidden>↻ Dauerdrehung aktiv</p>
+      </section>
+
+      <div class="panels">
+        <p class="mode-hint" id="mode-hint" hidden></p>
+
+        <!-- Kopf ------------------------------------------------------------ -->
+        <section class="panel" data-panel="head">
+          <header class="panel-head">
+            <h1>Kopf</h1>
+            <p>Ziehe im Feld, damit StackChan dorthin schaut. Pfeiltasten bewegen den Kopf schrittweise, <kbd>Pos1</kbd> zentriert ihn.</p>
+          </header>
+
+          <div class="card">
+            <div class="pad" id="pad" tabindex="0" role="group" aria-label="Blickrichtung (Pfeiltasten zum Bewegen)">
+              <span class="pad-axis pad-axis-x"></span>
+              <span class="pad-axis pad-axis-y"></span>
+              <span class="pad-label pad-top">hoch</span>
+              <span class="pad-label pad-bottom">tief</span>
+              <span class="pad-label pad-left">links</span>
+              <span class="pad-label pad-right">rechts</span>
+              <span class="pad-knob" id="pad-knob"></span>
+            </div>
+            <div class="actions">
+              <button class="btn" type="button" data-move="center">Mitte</button>
+              <button class="btn" type="button" data-move="nod">Nicken</button>
+              <button class="btn" type="button" data-move="shake">Kopfschütteln</button>
+              <button class="btn" type="button" data-move="look">Umschauen</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Feineinstellung</h2>
+            <div class="sliders" id="motion-sliders"></div>
+          </div>
+
+          <div class="card">
+            <h2>Dauerdrehung</h2>
+            <p class="muted">Der Drehservo kann sich endlos drehen. Negative Werte drehen in die andere Richtung.</p>
+            <div class="sliders" id="rotate-sliders"></div>
+            <div class="actions">
+              <button class="btn" type="button" id="rotate-stop">Drehung stoppen</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Gesicht --------------------------------------------------------- -->
+        <section class="panel" data-panel="face" hidden>
+          <header class="panel-head">
+            <h1>Gesicht</h1>
+            <p>Wähle einen Ausdruck oder stelle Augen und Mund selbst ein.</p>
+          </header>
+
+          <div class="card">
+            <h2>Ausdrücke</h2>
+            <div class="presets" id="expression-presets"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h2>Augen</h2>
+              <label class="switch"><input type="checkbox" id="mirror-eyes" checked> Beide Augen gemeinsam</label>
+            </div>
+            <div class="columns">
+              <fieldset>
+                <legend>Linkes Auge</legend>
+                <div class="sliders" id="left-eye-sliders"></div>
+              </fieldset>
+              <fieldset>
+                <legend>Rechtes Auge</legend>
+                <div class="sliders" id="right-eye-sliders"></div>
+              </fieldset>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Mund</h2>
+            <div class="sliders" id="mouth-sliders"></div>
+          </div>
+        </section>
+
+        <!-- Licht ----------------------------------------------------------- -->
+        <section class="panel" data-panel="light" hidden>
+          <header class="panel-head">
+            <h1>Licht</h1>
+            <p>Die zwei LED-Leisten am Körper lassen sich getrennt einfärben.</p>
+          </header>
+
+          <div class="card">
+            <div class="card-head">
+              <h2>Farben</h2>
+              <label class="switch"><input type="checkbox" id="leds-linked" checked> Beide gleich</label>
+            </div>
+            <div class="color-row">
+              <label class="color-field">
+                <input type="color" id="led-left-color" value="#000000">
+                <span>Links</span>
+              </label>
+              <label class="color-field">
+                <input type="color" id="led-right-color" value="#000000">
+                <span>Rechts</span>
+              </label>
+            </div>
+            <div class="swatches" id="swatches" aria-label="Schnellfarben"></div>
+            <div class="sliders" id="led-sliders"></div>
+            <div class="actions">
+              <button class="btn" type="button" id="led-off">Ausschalten</button>
+              <label class="switch"><input type="checkbox" id="led-rainbow"> Regenbogen</label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tanz ------------------------------------------------------------ -->
+        <section class="panel" data-panel="dance" hidden>
+          <header class="panel-head">
+            <h1>Tanz</h1>
+            <p>Ein Tanz ist eine Folge von Posen. Stelle Kopf, Gesicht und Licht ein und füge die Pose als Schritt hinzu.</p>
+          </header>
+
+          <div class="card">
+            <div class="dance-bar">
+              <label class="field grow">
+                <span>Tanz</span>
+                <select id="dance-select"></select>
+              </label>
+              <label class="field grow">
+                <span>Name</span>
+                <input type="text" id="dance-name" maxlength="40" placeholder="Mein Tanz">
+              </label>
+            </div>
+            <div class="actions">
+              <button class="btn" type="button" id="dance-new">Neu</button>
+              <button class="btn" type="button" id="dance-save">Speichern</button>
+              <button class="btn" type="button" id="dance-delete">Löschen</button>
+              <span class="spacer"></span>
+              <button class="btn" type="button" id="dance-import">Importieren…</button>
+              <button class="btn" type="button" id="dance-export">Exportieren…</button>
+              <input type="file" id="dance-file" accept=".json,application/json" hidden>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h2>Schritte <span class="count" id="frame-count">0</span></h2>
+              <div class="actions tight">
+                <label class="field inline">
+                  <span>Dauer</span>
+                  <input type="number" id="frame-duration" min="50" max="10000" step="50" value="800">
+                  <span>ms</span>
+                </label>
+                <button class="btn" type="button" id="frame-add">+ Aktuelle Pose</button>
+              </div>
+            </div>
+            <ol class="frames" id="frames"></ol>
+            <p class="empty" id="frames-empty">Noch keine Schritte. Stelle eine Pose ein und klicke auf „+ Aktuelle Pose“.</p>
+            <div class="actions">
+              <button class="btn primary" type="button" id="dance-play">▶ Abspielen</button>
+              <label class="switch"><input type="checkbox" id="dance-loop"> Wiederholen</label>
+            </div>
+          </div>
+        </section>
+
+        <!-- WLAN ------------------------------------------------------------ -->
+        <section class="panel" data-panel="wifi" hidden>
+          <header class="panel-head">
+            <h1>WLAN einrichten</h1>
+            <p>Überträgt Netzwerkname und Passwort an StackChan. Der Roboter muss dafür im Einrichtungsmodus sein (App <b>SETUP</b> bzw. erster Start).</p>
+          </header>
+
+          <form class="card" id="wifi-form" autocomplete="off">
+            <label class="field">
+              <span>Netzwerkname (SSID)</span>
+              <input type="text" id="wifi-ssid" required maxlength="32" spellcheck="false">
+            </label>
+            <label class="field">
+              <span>Passwort</span>
+              <span class="input-row">
+                <input type="password" id="wifi-password" maxlength="64" spellcheck="false">
+                <button class="btn" type="button" id="wifi-toggle">Anzeigen</button>
+              </span>
+            </label>
+            <p class="muted">StackChan unterstützt nur 2,4-GHz-Netze.</p>
+            <div class="actions">
+              <button class="btn primary" type="submit" id="wifi-send">An StackChan senden</button>
+              <button class="btn" type="button" id="wifi-status">Status abfragen</button>
+            </div>
+            <p class="wifi-state" id="wifi-state" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <!-- Hilfe ----------------------------------------------------------- -->
+        <section class="panel" data-panel="help" hidden>
+          <header class="panel-head">
+            <h1>Hilfe</h1>
+            <p>So verbindest du StackChan mit diesem PC.</p>
+          </header>
+
+          <div class="card prose">
+            <h2>Erste Schritte</h2>
+            <ol>
+              <li>Bluetooth am PC einschalten (Windows-Einstellungen → Bluetooth und Geräte).</li>
+              <li>Am StackChan die App <b>DANCE</b> öffnen. Nur in dieser App nimmt der Roboter Befehle für Kopf, Gesicht und Licht per Bluetooth an.</li>
+              <li>Hier links auf <b>Verbinden</b> klicken und „StackChan“ auswählen.</li>
+            </ol>
+            <p>Ohne Verbindung läuft die App im Vorschau-Modus: Du kannst alles ausprobieren und Tänze bauen, die Vorschau zeigt das Ergebnis.</p>
+
+            <h2>WLAN einrichten</h2>
+            <p>Beim ersten Start oder über die App <b>SETUP</b> wartet StackChan auf eine Verbindung. Dann verbinden und im Bereich <b>WLAN</b> die Zugangsdaten senden.</p>
+
+            <h2>Wenn es nicht klappt</h2>
+            <ul>
+              <li>StackChan erscheint nicht: Prüfe, ob DANCE oder SETUP geöffnet ist, und ob das Handy noch verbunden ist – es kann immer nur ein Gerät verbunden sein.</li>
+              <li>Verbindung bricht ab: Abstand verringern. Die App versucht automatisch, sich neu zu verbinden.</li>
+              <li>Kein Bluetooth: Ältere PCs brauchen eventuell einen Bluetooth-4.0-USB-Stick (Bluetooth Low Energy).</li>
+            </ul>
+
+            <h2>Was diese App nicht kann</h2>
+            <p>KI-Gespräche, Kamera, Konto und Geräte-Bindung der Handy-App laufen über die M5Stack-Cloud bzw. einen eigenen Server und sind hier nicht enthalten.</p>
+
+            <h2>Links</h2>
+            <ul>
+              <li><a href="https://docs.m5stack.com/en/StackChan" target="_blank" rel="noreferrer">StackChan-Dokumentation (M5Stack)</a></li>
+              <li><a href="https://github.com/m5stack/StackChan" target="_blank" rel="noreferrer">Quellcode auf GitHub</a></li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="picker" aria-labelledby="picker-title">
+    <h2 id="picker-title">StackChan auswählen</h2>
+    <p class="muted" id="picker-hint">Suche nach Geräten in der Nähe…</p>
+    <ul class="device-list" id="device-list"></ul>
+    <div class="actions end">
+      <button class="btn" type="button" id="picker-cancel">Abbrechen</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="ble.js"></script>
+  <script src="face.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
