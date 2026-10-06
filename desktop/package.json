@@ -4,15 +4,52 @@
   "version": "1.0.0",
   "description": "Desktop-App zum Steuern des M5Stack StackChan per Bluetooth",
   "main": "main.js",
+  "author": "samubraila",
   "license": "MIT",
   "private": true,
   "scripts": {
     "start": "electron .",
     "icon": "node scripts/make-icon.js",
-    "package": "electron-packager . \"StackChan Desktop\" --platform=win32 --arch=x64 --out=dist --overwrite --asar --icon=build/icon.ico --ignore=^/dist --ignore=^/scripts --ignore=^/build/icons --ignore=^/README.md --ignore=^/\\.gitignore"
+    "package": "electron-packager . \"StackChan Desktop\" --platform=win32 --arch=x64 --out=dist --overwrite --asar --icon=build/icon.ico --ignore=^/dist --ignore=^/scripts --ignore=^/build/icons --ignore=^/README.md --ignore=^/\\.gitignore",
+    "installer": "electron-builder --win nsis --x64"
+  },
+  "build": {
+    "appId": "io.github.samubraila.stackchan-desktop",
+    "productName": "StackChan Desktop",
+    "copyright": "MIT License",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "npmRebuild": false,
+    "win": {
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "StackChan Desktop",
+      "runAfterFinish": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerLanguages": ["de_DE"],
+      "language": "1031",
+      "artifactName": "StackChan-Desktop-Setup-${version}.exe"
+    }
   },
   "devDependencies": {
     "@electron/packager": "^20.3.0",
-    "electron": "^44.5.1"
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3"
   }
 }

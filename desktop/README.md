@@ -10,9 +10,15 @@ Windows-App, die einen M5Stack StackChan direkt per Bluetooth steuert – ohne H
 
 Ohne Verbindung läuft alles im Vorschau-Modus.
 
+## Installieren
+
+`StackChan-Desktop-Setup-x.y.z.exe` unter [Releases](https://github.com/samubraila/StackChan/releases) herunterladen und ausführen. Der Installer legt Verknüpfungen im Startmenü und auf dem Desktop an; deinstallieren über *Einstellungen → Apps*.
+
+Die Datei ist nicht signiert. Zeigt Windows „Der Computer wurde durch Windows geschützt“, auf **Weitere Informationen → Trotzdem ausführen** klicken.
+
 ## Starten
 
-Fertige App: `dist/StackChan Desktop-win32-x64/StackChan Desktop.exe`
+Aus dem Build-Ordner: `dist/win-unpacked/StackChan Desktop.exe`
 
 Aus dem Quellcode (Node.js 22.12 oder neuer):
 
@@ -22,7 +28,7 @@ node node_modules/electron/install.js   # lädt die Electron-Laufzeit
 npm start
 ```
 
-Neu bauen: `npm run package`. Das Icon wird aus `build/icons/*.png` mit `npm run icon` erzeugt.
+Installer bauen: `npm run installer` (ergibt `dist/StackChan-Desktop-Setup-<version>.exe`). Nur den App-Ordner ohne Installer: `npm run package`. Das Icon wird aus `build/icons/*.png` mit `npm run icon` erzeugt.
 
 ## Verbindung
 
